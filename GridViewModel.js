@@ -173,21 +173,30 @@ var GridViewModel = _class(function() {
 			this.cells.splice(this.cells.indexOf(cell), 1);
 			this.movement.push(new FrameDataViewModel(cell, RenderType.delete));
 			this._compactCells({left:cell.pos.x + cell.size.colspan, top:cell.pos.y, 
-				width: _maxCols - cell.pos.x - cell.size.colspan, height: cell.size.rowspan}, cell.size);
+				right: _maxCols, bottom:cell.pos.y + cell.size.rowspan}, cell.size);
 			this._cleanUpActiveCells(cell);
 		},
 		findLeftAdjacencies: function(cell) {
-			function _pointInSegment(pos, cell) {
-				return(pos.y >= cell.pos.y) && (pos.y < (cell.pos.y + cell.size.rowspan));
-			}
+			var this_ = this;
 			return this._grep(this.cells, function(c) {
-				return ((c.pos.x + c.size.colspan) == cell.pos.x) && (_pointInSegment(c.pos, cell) || _pointInSegment(cell.pos, c));
+				return ((c.pos.x + c.size.colspan) == cell.pos.x) && 
+					(this_._pointInSegment(c.pos, cell) || this_._pointInSegment(cell.pos, c));
+			});
+		},
+		_pointInSegment: function(pos, cell) {
+			return(pos.y >= cell.pos.y) && (pos.y < (cell.pos.y + cell.size.rowspan));
+		},
+		_findRightAdjacencies: function(cell) {
+			var this_ = this;
+			return this._grep(this.cells, function(c) {
+				return (c.pos.x == (cell.pos.x + cell.size.colspan)) && 
+					(this_._pointInSegment(c.pos, cell) || this_._pointInSegment(cell.pos, c));
 			});
 		},
 		_compactCells: function(range, offset) {
 			// move left
 			var frames = [];
-			var cells = this._findCellsInRange(range);
+			var cells = this._findIntersectedCells(range);
 			var i = 0;
 			var leftAdjacencies;
 			var this_ = this;
@@ -195,6 +204,7 @@ var GridViewModel = _class(function() {
 			var movingCells = [];
 			var stickingCells = [];
 			var prop;
+			var temp;
 			while (i < cells.length) {
 				leftAdjacencies = this.findLeftAdjacencies(cells[i]);
 				if (!leftAdjacencies.length) {
@@ -202,9 +212,15 @@ var GridViewModel = _class(function() {
 						depends[prop].splice(depends[prop].indexOf(cells[i]), 1);
 					}
 					movingCells.push(cells[i]);
+					temp = this._findRightAdjacencies(cells[i]);
+					this._each(temp, function(i, t) {
+						if (movingCells.indexOf(t) < 0 && (cells.indexOf(t) < 0) && 
+							(stickingCells.indexOf(t) < 0)) cells.push(t);
+					});
 					cells.splice(i, 1);
 				} else if (this._any(leftAdjacencies, function(adjacency) {
-						return ((cells.indexOf(adjacency) < 0) && (movingCells.indexOf(adjacency) < 0)) || (stickingCells.indexOf(adjacency) > -1);
+						return ((cells.indexOf(adjacency) < 0) && (movingCells.indexOf(adjacency) < 0)) || 
+							(stickingCells.indexOf(adjacency) > -1);
 					})) {
 					this_._each(Object.getOwnPropertyNames(depends), function(k, prop) {
 						if (depends[prop].indexOf(cells[i]) > -1) {
@@ -270,6 +286,19 @@ var GridViewModel = _class(function() {
 			//}
 			this.movement.push(frames);
 		},
+		_findIntersectedCells: function(rect) {
+			var this_ = this;
+			return this._grep(this.cells, function(c) {
+				return this_._isRectIntersect(rect, {
+					left: c.pos.x, right: c.pos.x + c.size.colspan,
+					top: c.pos.y, bottom: c.pos.y + c.size.rowspan
+				});
+			});
+		},
+		_isRectIntersect: function(rect1, rect2) {
+			return (Math.max(rect1.left, rect2.left) < Math.min(rect1.right, rect2.right)) &&
+				(Math.max(rect1.top, rect2.top) < Math.min(rect1.bottom, rect2.bottom));
+		},
 		/*
 		 * find the right most cell which has intersection with the rect
 		 *
@@ -278,13 +307,10 @@ var GridViewModel = _class(function() {
 		 *
 		 */
 		_findRightMost: function(rect) {
-			function _isRectIntersect(rect1, rect2) {
-				return (Math.max(rect1.left, rect2.left) < Math.min(rect1.right, rect2.right)) &&
-					(Math.max(rect1.top, rect2.top) < Math.min(rect1.bottom, rect2.bottom));
-			}
 			var result;
+			var this_ = this;
 			this._each(this.cells, function(i, c) {
-				if (_isRectIntersect({left:c.pos.x, right:c.pos.x+c.size.colspan, top:c.pos.y, bottom:c.pos.y+c.size.rowspan}, rect) && 
+				if (this_._isRectIntersect({left:c.pos.x, right:c.pos.x+c.size.colspan, top:c.pos.y, bottom:c.pos.y+c.size.rowspan}, rect) && 
 					(!result || ((result.pos.x + result.size.colspan) < (c.pos.x + c.size.colspan)))) {
 					result = c;
 				}

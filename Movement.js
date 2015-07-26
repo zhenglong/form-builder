@@ -41,7 +41,8 @@ var Movement = _class(function () {
 	this.init = function() {
 		var _methods = {
 			/*
-			 * frame: could be single or plural.
+			 * @param {FrameDataViewModel or array of FrameDataViewModel} frame
+			 * could be single or plural.
 			 */
 			push: function(frames) {
 				if (frames.length) this._queue.push.apply(this._queue, frames);
@@ -64,7 +65,9 @@ var Movement = _class(function () {
 						frame.cell.elem.appendTo(frame.data.parent);
 						break;
 					case RenderType.move:
-						frame.cell.elem.toggleClass(frame.cell.makeCls(frame.data.from.y, frame.data.from.x) + ' ' + frame.cell.makeCls(frame.data.to.y, frame.data.to.x));
+						frame.cell.elem.toggleClass(frame.cell.makeCls(
+									frame.data.from.y, frame.data.from.x) + ' ' + 
+									frame.cell.makeCls(frame.data.to.y, frame.data.to.x));
 						break;
 					case RenderType.delete:
 						frame.cell.elem.remove();
