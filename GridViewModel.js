@@ -1,9 +1,14 @@
 "use strict";
 
+var GridSize = {
+	maxRows: 12,
+	maxCols: 12
+};
+
 var GridViewModel = _class(function() {
 	this.upper().constructor.apply(this, arguments);
-	var _maxRows = 12;
-	var _maxCols = 12;
+	var _maxRows = GridSize.maxRows;
+	var _maxCols = GridSize.maxCols;
 	this.cells = [];
 	this._activeCells = [];
 	this.elem = $('<div class="builder"></div>');
@@ -39,7 +44,6 @@ var GridViewModel = _class(function() {
 					c.setSize({rowspan: rowspan, colspan: colspan});
 					c.setPos({x: i*colspan, y: j*rowspan});
 					this.insert(c);
-					frames.push(this._getInsertFrame(c));
 				}
 			}
 			this.render();
@@ -140,34 +144,107 @@ var GridViewModel = _class(function() {
 			return new FrameDataViewModel(cell, RenderType.insert, {parent:this.elem});
 		},
 		insert: function(cell) {
-			// TODO: check whether there is enough space for the cell
-			/* normalize the cell's pos and size by row and col */
-			var start, end, cells, sum;
 			this.cells.push(cell);
-			start = cell.pos.y, end = cell.pos.y + cell.size.rowspan;
-			while (start < end) {/* for each row */
-				cells = this._grep(this.cells, function(c) {
-					return c.isInRow(start);
+			this.movement.push(this._getInsertFrame(cell));
+		},
+		insertAfter: function(ref, cell) {
+			// the grid could be expanded unlimited in both horizontal and vertical directions,
+			// so need to check whether the operation is valid.
+			var frames = [];
+			this._insert(ref, cell.size.colspan, frames);
+
+			this.cells.push(cell);
+			frames.push(this._getInsertFrame(cell));
+			this.movement.push(frames);
+		},
+		_rightAdjacencyTraversal: function(from, cb) {
+			var adjacencies = this._findRightAdjacencies(from);
+			var this_ = this;
+			if (adjacencies.length) {
+				this._each(adjacencies, function(i, adjancency) {
+					this_._rightAdjacencyTraversal(adjancency, cb);
+					cb(adjancency);
 				});
-				sum = this._sum(cells, function(c) {
-					return c.size.colspan;
-				});
-				if (sum > this.spacing.h[start]) throw ('row spaceing is run out:' + start);
-				this._adjustRow(cells);
-				start++;
 			}
-			start = cell.pos.x, end = cell.pos.x + cell.size.colspan;
-			while (start < end) { /* for each col */
-				cells = this._grep(this.cells, function(c) {
-					return c.isInColumn(start);
-				});
-				sum = this._sum(cells, function(c) {
-					return c.size.rowspan;
-				});
-				if (sum > this.spacing.v[start]) throw ('column spacing is run out:' + start);
-				this._adjustColumn(cells);
-				start++;
-			}
+		},
+		_insert: function(ref, colOffset, frames) {
+			this._rightAdjacencyTraversal(ref, function(adjacency) {
+				frames.push(new FrameDataViewModel(adjacency, RenderType.move, 
+						{from: {x: adjacency.pos.x, y: adjacency.pos.y}, 
+						to: {x: adjacency.pos.x + colOffset, y:adjacency.pos.y}}));
+				adjacency.setPosX(adjacency.pos.x + colOffset);
+			});
+		},
+		insertBefore: function(ref, cell) {
+			var frames = [];
+			this._insert(cell, cell.size.colspan, frames);
+
+			cell.setPosX(cell.pos.x + 1);
+			this.cells.push(cell);
+			frames.push(this._getInsertFrame(cell));
+			this.movement.push(frames);
+		},
+		_insertNewRow: function(ref, top, cell) {
+			var frames = [];
+			this._each(this.cells, function(i, c) {
+				if (c.pos.y >= top) {
+					frames.push(new FrameDataViewModel(c, RenderType.move, {
+						from: {x: c.pos.x, y: c.pos.y},
+						to: {x: c.pos.x, y: c.pos.y + cell.size.rowspan}
+					}));
+					c.setPosY(c.pos.y + cell.size.rowspan);
+				}
+			});
+			
+			this.cells.push(cell);
+			frames.push(this._getInsertFrame(cell));
+			this.movement.push(frames);
+		},
+		insertAbove: function(ref, cell) {
+			this._insertNewRow(ref, ref.pos.y, cell);
+		},
+		insertBelow: function(ref, cell) {
+			this._insertNewRow(ref, ref.pos.y + ref.size.rowspan, cell);
+		},
+		_couldInsertNewRow: function(ref, alignCb) {
+			var this_ = this;
+			var rect = {
+				left: 0, 
+				right: GridSize.maxCols, 
+				top: ref.pos.y, 
+				bottom: ref.pos.y + ref.size.rowspan
+			};
+			var result = true;
+			this._each(this.cells, function(i, c) {
+				if (this_._isRectIntersect(rect, {
+					left: c.pos.x,
+					right: c.pos.x + c.size.colspan,
+				    top: c.pos.y,
+				    bottom: c.pos.y + c.size.rowspan
+				})) {
+					result = alignCb(c);
+					if (!result) return false;
+				}
+			});
+			return result;
+		},
+		/*
+		 * all the cells line with ref should be bottom-align
+		 *
+		 */
+		couldInsertNewRowBelow: function(ref) {
+			return this._couldInsertNewRow(ref, function(c) {
+				return ((c.pos.y + c.size.rowspan) == (ref.pos.y + ref.size.rowspan));
+			});
+		},
+		/*
+		 * all the cells line with ref should be top-align
+		 *
+		 */
+		couldInsertNewRowAbove: function(ref) {
+			return this._couldInsertNewRow(ref, function(c) {
+				return (c.pos.y == ref.pos.y);
+			});
 		},
 		remove: function(cell) {
 			this.cells.splice(this.cells.indexOf(cell), 1);

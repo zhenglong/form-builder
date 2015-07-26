@@ -18,8 +18,8 @@
 	background-color:#ddd;
 	border-color:#ddd;
 }
-@for $row from 1 through 12 {
-	@for $col from 1 through 12 {
+@for $row from 1 through 24 {
+	@for $col from 1 through 24 {
 		.cell-#{$row}-#{$col} {
 			left:#{($col - 1) * 8.333333333%};
 			top:#{($row - 1) * 8.333333333%};

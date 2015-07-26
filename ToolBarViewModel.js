@@ -14,6 +14,8 @@ var ToolBarViewModel = _class(function () {
 			$.each(cells, function(i, c) {
 				inserting = new CellViewModel();
 				inserting.init(self.grid);
+				inserting.setPos({x: c.pos.x + c.size.colspan, y: c.pos.y});
+				inserting.setSize({colspan: 1, rowspan: c.size.rowspan});
 				inserting.insertAfter(c);
 			});
 		}
@@ -26,7 +28,37 @@ var ToolBarViewModel = _class(function () {
 			$.each(cells, function(i, c) {
 				inserting = new CellViewModel();
 				inserting.init(self.grid);
+				inserting.setPos({x: c.pos.x - 1, y: c.pos.y});
+				inserting.setSize({colspan: 1, rowspan: c.size.rowspan});
 				inserting.insertBefore(c);
+			});
+		}
+	},{
+		id: 'insert-above',
+		text: '之上插入一行',
+		classes: 'hide',
+		click: function() {
+			var cells = self._cloneArray(self.grid.getActiveCells()), inserting;
+			$.each(cells, function(i, c) {
+				inserting = new CellViewModel();
+				inserting.init(self.grid);
+				inserting.setPos({x: 0, y: c.pos.y});
+				inserting.setSize({colspan: GridSize.maxCols, rowspan: 1});
+				inserting.insertAbove(c);
+			});
+		}
+	},{
+		id: 'insert-below',
+		text: '之下插入一行',
+		classes: 'hide',
+		click: function() {
+			var cells = self._cloneArray(self.grid.getActiveCells()), inserting;
+			$.each(cells, function(i, c) {
+				inserting = new CellViewModel();
+				inserting.init(self.grid);
+				inserting.setPos({x: 0, y: c.pos.y + c.size.rowspan});
+				inserting.setSize({colspan: GridSize.maxCols, rowspan: 1});
+				inserting.insertBelow(c);
 			});
 		}
 	},{
@@ -100,6 +132,8 @@ var ToolBarViewModel = _class(function () {
 			var isAnySelected = !!cells.length;
 			var canSplitV = isAnySelected, canSplitH = isAnySelected, canMerge = true;
 			var canInsertAfter = isAnySelected, canInsertBefore = isAnySelected;
+			var canInsertAbove = (cells.length == 1) && this.grid.couldInsertNewRowAbove(cells[0]), 
+				canInsertBelow = (cells.length == 1) && this.grid.couldInsertNewRowBelow(cells[0]);
 			var canDelete = isAnySelected;
 			this._each(cells, function(i, c) {
 				canSplitH = canSplitH && (c.size.colspan > 1);
@@ -109,6 +143,8 @@ var ToolBarViewModel = _class(function () {
 
 			this._btnVisible('insert-after', canInsertAfter);
 			this._btnVisible('insert-before', canInsertBefore);
+			this._btnVisible('insert-above', canInsertAbove);
+			this._btnVisible('insert-below', canInsertBelow);
 			this._btnVisible('remove', canDelete);
 			this._btnVisible('split-v', canSplitV);
 			this._btnVisible('split-h', canSplitH);

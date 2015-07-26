@@ -79,33 +79,17 @@ var CellViewModel = _class(function () {
 			this.pos.y = v;
 			this._invalidated = true;
 		},
-		insertAfter: function(cell) {
-			this.size.rowspan = cell.size.rowspan;
-			this.size.colspan = cell.size.colspan;
-			this.pos.x = cell.pos.x + 1;
-			this.pos.y = cell.pos.y;
-			this.container.insert(cell);
+		insertAfter: function(ref) {
+			this.container.insertAfter(ref, this);
 		},
-		insertBefore: function(cell) {
-			this.size.rowspan = cell.size.rowspan;
-			this.size.colspan = cell.size.colspan;
-			this.pos.x = cell.pos.x - 1;
-			this.pos.y = cell.pos.y;
-			this.container.insert(cell);
+		insertBefore: function(ref) {
+			this.container.insertBefore(ref, this);
 		},
-		insertAbove: function(cell) {
-			this.size.rowspan = cell.size.rowspan;
-			this.size.colspan = cell.size.colspan;
-			this.pos.x = cell.pos.x;
-			this.pos.y = cell.pos.y - 1;
-			this.container.insert(cell);
+		insertAbove: function(ref) {
+			this.container.insertAbove(ref, this);
 		},
-		insertBottom: function(cell) {
-			this.size.rowspan = cell.size.rowspan;
-			this.size.colspan = cell.size.colspan;
-			this.pos.x = cell.pos.x;
-			this.pos.y = cell.pos.y + 1;
-			this.container.insert(cell);
+		insertBelow: function(ref) {
+			this.container.insertBelow(ref, this);
 		},
 		remove: function() {
 			this.container.remove(this);
