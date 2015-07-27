@@ -67,9 +67,13 @@ var ToolBarViewModel = _class(function () {
 		classes: 'hide',
 		click: function() {
 			var cells = self._cloneArray(self.grid.getActiveCells()), inserting;
+			var result = self._getOuterRect(cells);
 			$.each(cells, function(i, c) {
 				c.remove();
 			});
+			if ((result.diff == 0) && (result.rect.left == 0 && result.rect.right == GridSize.maxCols)) {
+				self.grid.compactCellsUp(result.rect.bottom, result.rect.bottom - result.rect.top);
+			}
 		}
 	},{
 		id: 'split-h',
@@ -117,7 +121,7 @@ var ToolBarViewModel = _class(function () {
 			this._registerEvents();
 			this.grid.subscribeActiveCellsChange(this._onActiveCellsChange.bind(this));
 		},
-		_isRect: function(cells) {
+		_getOuterRect: function(cells) {
 			var i, l = 10000, r = 0, t = 10000, b = 0, sum = 0;
 			for (i = 0; i < cells.length; i++) {
 				sum += cells[i].size.rowspan * cells[i].size.colspan;
@@ -126,7 +130,11 @@ var ToolBarViewModel = _class(function () {
 				t = Math.min(t, cells[i].pos.y);
 				b = Math.max(b, cells[i].pos.y + cells[i].size.rowspan);
 			}
-			return ((r - l) * (b - t) == sum);
+			return {rect: {left: l, right: r, top: t, bottom: b}, diff: ((r - l) * (b - t) - sum)};
+		},
+		_isRect: function(cells) {
+			var result = this._getOuterRect(cells);
+			return result.diff == 0;
 		},
 		_onActiveCellsChange: function(cells) {
 			var isAnySelected = !!cells.length;

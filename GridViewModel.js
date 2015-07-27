@@ -249,7 +249,7 @@ var GridViewModel = _class(function() {
 		remove: function(cell) {
 			this.cells.splice(this.cells.indexOf(cell), 1);
 			this.movement.push(new FrameDataViewModel(cell, RenderType.delete));
-			this._compactCells({left:cell.pos.x + cell.size.colspan, top:cell.pos.y, 
+			this._compactCellsLeft({left:cell.pos.x + cell.size.colspan, top:cell.pos.y, 
 				right: _maxCols, bottom:cell.pos.y + cell.size.rowspan}, cell.size);
 			this._cleanUpActiveCells(cell);
 		},
@@ -270,7 +270,7 @@ var GridViewModel = _class(function() {
 					(this_._pointInSegment(c.pos, cell) || this_._pointInSegment(cell.pos, c));
 			});
 		},
-		_compactCells: function(range, offset) {
+		_compactCellsLeft: function(range, offset) {
 			// move left
 			var frames = [];
 			var cells = this._findIntersectedCells(range);
@@ -350,17 +350,17 @@ var GridViewModel = _class(function() {
 						{from: {x: cell.pos.x, y: cell.pos.y}, to: {x: newX, y: cell.pos.y}}));
 				cell.setPosX(newX);
 			});
-			//if (!cells.length) {
-			//	// move up
-			//	range.top = range.top + range.height;
-			//	range.height = _maxRows - range.top;
-			//	cells = this._findCellsInRange(range);
-			//	this._each(cells, function(i, cell) {
-			//		frames.push(new FrameDataViewModel(cell, RenderType.move,
-			//				{from: {x:cell.pos.x, y:cell.pos.y}, to: {x: cell.pos.x, y: cell.pos.y - offset.rowspan}}));
-			//		cell.setPosY(cell.pos.y - offset.rowspan);
-			//	});
-			//}
+			this.movement.push(frames);
+		},
+		compactCellsUp: function(top, yOffset) {
+			var frames = [];
+			this._each(this.cells, function(i, cell) {
+				if (cell.pos.y < top) return;
+				frames.push(new FrameDataViewModel(cell, RenderType.move,
+						{from: {x:cell.pos.x, y:cell.pos.y}, 
+						 to: {x: cell.pos.x, y: cell.pos.y - yOffset}}));
+				cell.setPosY(cell.pos.y - yOffset);
+			});
 			this.movement.push(frames);
 		},
 		_findIntersectedCells: function(rect) {
