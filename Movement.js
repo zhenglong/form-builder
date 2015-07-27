@@ -37,7 +37,10 @@ var RenderType = {
 })();
 var Movement = _class(function () {
 	this._queue = [];
+	this._nextRun = 0;
 	this._running = false;
+	var _delay = 15;
+
 	this.init = function() {
 		var _methods = {
 			/*
@@ -55,23 +58,33 @@ var Movement = _class(function () {
 				window.onEachFrame(this._doJob.bind(this));
 			},
 			_doJob: function() {
+				function _act() {
+					if (!this._hasAny()) {
+						this._running = false;
+						this._nextRun = 0;
+						return;
+					}
+					var frame = this._fetchFrame();
+					switch(frame.type) {
+						case RenderType.insert:
+							frame.cell.elem.appendTo(frame.data.parent);
+							break;
+						case RenderType.move:
+							frame.cell.elem.toggleClass(frame.cell.makeCls(
+										frame.data.from.y, frame.data.from.x) + ' ' + 
+										frame.cell.makeCls(frame.data.to.y, frame.data.to.x));
+							break;
+						case RenderType.delete:
+							frame.cell.elem.remove();
+					}
+				}
 				if (!this._hasAny()) {
 					this._running = false;
+					this._nextRun = 0;
 					return;
 				}
-				var frame = this._fetchFrame();
-				switch(frame.type) {
-					case RenderType.insert:
-						frame.cell.elem.appendTo(frame.data.parent);
-						break;
-					case RenderType.move:
-						frame.cell.elem.toggleClass(frame.cell.makeCls(
-									frame.data.from.y, frame.data.from.x) + ' ' + 
-									frame.cell.makeCls(frame.data.to.y, frame.data.to.x));
-						break;
-					case RenderType.delete:
-						frame.cell.elem.remove();
-				}
+				setTimeout(_act.bind(this), this._nextRun);
+				this._nextRun += _delay;
 			},
 			_hasAny: function() {
 				return !!this._queue.length;

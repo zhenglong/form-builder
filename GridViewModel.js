@@ -73,7 +73,7 @@ var GridViewModel = _class(function() {
 		},
 		merge: function(left, right, top, bottom) {
 			/* the cell should be in the area wholly */
-			var cells = this._findCellsInRange({left:left, top:top, width:right-left,height:bottom-top});
+			var cells = this._findCellsInRange({left:left, top:top, right:right,bottom:bottom});
 			var new_ = new CellViewModel();
 			new_.init(this);
 			new_.setPos({x:left, y:top});
@@ -396,8 +396,8 @@ var GridViewModel = _class(function() {
 		},
 		_findCellsInRange: function(range) {
 			function _isPointInRange(point, range) {
-				return (point.x >= range.left && point.x <= (range.left + range.width)) && 
-					(point.y >= range.top && point.y <= (range.top + range.height));
+				return (point.x >= range.left && point.x <= range.right) && 
+					(point.y >= range.top && point.y <= range.bottom);
 			}
 			return this._grep(this.cells, function(cell) {
 				return _isPointInRange(cell.pos, range) && 

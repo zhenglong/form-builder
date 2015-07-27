@@ -67,13 +67,17 @@ var ToolBarViewModel = _class(function () {
 		classes: 'hide',
 		click: function() {
 			var cells = self._cloneArray(self.grid.getActiveCells()), inserting;
-			var result = self._getOuterRect(cells);
+			var cellsInRange;
 			$.each(cells, function(i, c) {
 				c.remove();
 			});
-			if ((result.diff == 0) && (result.rect.left == 0 && result.rect.right == GridSize.maxCols)) {
-				self.grid.compactCellsUp(result.rect.bottom, result.rect.bottom - result.rect.top);
-			}
+			self._each(cells, function(i, c) {
+				cellsInRange = self.grid._findCellsInRange({
+					left: 0, right: GridSize.maxCols,
+					top: c.pos.y, bottom: c.pos.y + c.size.rowspan
+				});
+				if (!cellsInRange.length) self.grid.compactCellsUp(c.pos.y + c.size.rowspan, c.size.rowspan);
+			});
 		}
 	},{
 		id: 'split-h',
