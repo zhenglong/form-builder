@@ -80,22 +80,43 @@ var ToolBarViewModel = _class(function () {
 					start++;
 				}
 			});
-			start = null;
+			end = null;
 			r = rows.length - 1;
 			while(r > -1) {
 				isTrue = rows[r];
-				if (!isTrue && !start) return;
-				if (!start) start = r;
-				//if (isTrue && ((r + 1) < rows.length) && rows[r + 1]) {
-				//	return;
-				//}
-				end = (isTrue ? (r + 1) : r);
-				cellsInRange = self.grid._findIntersectedCells({
-					left: 0, right: GridSize.maxCols,
-					top: start, bottom: end
-				});
-				if (!cellsInRange.length) self.grid.compactCellsUp(end, end - start);
-				start = null;
+				if (!isTrue && (end === null)) {
+					r--;
+					continue;
+				}
+
+				if (isTrue) {
+					cellsInRange = self.grid._findIntersectedCells({
+						left: 0, right: GridSize.maxCols,
+						top: r, bottom: r + 1
+					});
+					if (!cellsInRange.length) {
+						if (end === null) {
+							end = r + 1;
+						} else {
+							if (r === 0) {
+								self.grid.compactCellsUp(end, end - r);
+								end = null;
+							} else {
+								// nothing to do, continue to expand the empty row.
+							}
+						}
+					} else {
+						if (end !== null) {
+							self.grid.compactCellsUp(end, end - r - 1);
+							end = null;
+						} else {
+							// nothing to do
+						}
+					}
+				} else {
+					self.grid.compactCellsUp(end, end - r - 1);
+					end = null;
+				}
 				r--;
 			};
 		}
