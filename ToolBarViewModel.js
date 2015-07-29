@@ -71,13 +71,33 @@ var ToolBarViewModel = _class(function () {
 			$.each(cells, function(i, c) {
 				c.remove();
 			});
+			var rows = [], start, end, r, isTrue;
 			self._each(cells, function(i, c) {
-				cellsInRange = self.grid._findCellsInRange({
-					left: 0, right: GridSize.maxCols,
-					top: c.pos.y, bottom: c.pos.y + c.size.rowspan
-				});
-				if (!cellsInRange.length) self.grid.compactCellsUp(c.pos.y + c.size.rowspan, c.size.rowspan);
+				start = c.pos.y;
+				end = c.pos.y + c.size.rowspan;
+				while(start < end) {
+					rows[start] = 1;
+					start++;
+				}
 			});
+			start = null;
+			r = rows.length - 1;
+			while(r > -1) {
+				isTrue = rows[r];
+				if (!isTrue && !start) return;
+				if (!start) start = r;
+				//if (isTrue && ((r + 1) < rows.length) && rows[r + 1]) {
+				//	return;
+				//}
+				end = (isTrue ? (r + 1) : r);
+				cellsInRange = self.grid._findIntersectedCells({
+					left: 0, right: GridSize.maxCols,
+					top: start, bottom: end
+				});
+				if (!cellsInRange.length) self.grid.compactCellsUp(end, end - start);
+				start = null;
+				r--;
+			};
 		}
 	},{
 		id: 'split-h',
