@@ -418,8 +418,120 @@ var GridViewModel = _class(function() {
 				c.render();
 			});
 			this.upper().render.apply(this, arguments);
+		},
+		toHtml: function() {
+			var this_ = this;
+			function _isAnyThroughByRow(cells, y) {
+				var isTrue = false;
+				this_._each(cells, function(i, c) {
+					var bottom = c.pos.y + c.size.rowspan;
+					if (bottom > y && c.pos.y < y) {
+						isTrue = true;
+						return false;
+					}
+				});
+				return isTrue;
+			}
+			function _isAnyThroughByColumn(cells, x) {
+				var isTrue = false;
+				this_._each(cells, function(i, c) {
+					var right = c.pos.x + c.size.colspan;
+					if (right > x && c.pos.x < x) {
+						isTrue = true;
+						return false;
+					}
+				});
+				return isTrue;
+			}
+			function _getCellsByRowRange(cells, top, bottom) {
+				var result = [];
+				this_._each(cells, function(i, c) {
+					if ((c.pos.y >= top) && ((c.pos.y + c.size.rowspan) <= bottom)) {
+						result.push(c);
+					}
+				});
+				return result;
+			}
+			function _getCellsByColumnRange(cells, left, right) {
+				var result = [];
+				this_._each(cells, function(i, c) {
+					if ((c.pos.x >= left) && ((c.pos.x + c.size.colspan) <= right)) {
+						result.push(c);
+					}
+				});
+				return result;
+			}
+			function _splitByRow(cells) {
+				var bootstrapRows = [];
+				var start, end, cur;
+				var cellsInOneRow;
+				var row;
+				// sort by row
+				cells.sort(function(a, b) {
+					if (a.pos.y > b.pos.y) return 1;
+					else if (a.pos.y < b.pos.y) return -1;
+					else return 0;
+				});
+				start = cells[0].pos.y;
+				cur = start + 1;
+				end = cells[cells.length - 1].pos.y + cells[cells.length - 1].size.rowspan;
+				while (cur <= end) {
+					if (!_isAnyThroughByRow(cells, cur)) {
+						cellsInOneRow = _getCellsByRowRange(cells, start, cur);
+						row = new BootstrapRowViewModel();
+						row.top = start;
+						row.bottom = cur;
+						if (cellsInOneRow.length == 1) {
+							row.columns.push.apply(row.columns, cellsInOneRow);
+						} else if (cellsInOneRow.length > 1) {
+							row.columns.push.apply(row.columns, _splitByColumn(cellsInOneRow));
+						}
+						bootstrapRows.push(row);
+						start = cur;
+					}
+					cur++;
+				}
+				return bootstrapRows;
+			}
+			function _splitByColumn(cells) {
+				var bootstrapColumns = [];
+				var start, end, cur;
+				var cellsInOneColumn;
+				var column;
+				// sort by column
+				cells.sort(function(a, b) {
+					if (a.pos.x > b.pos.x) return 1;
+					else if (a.pos.x < b.pos.x) return -1;
+					else return 0;
+				});
+				start = cells[0].pos.x;
+				cur = start + 1;
+				end = cells[cells.length - 1].pos.x + cells[cells.length - 1].size.colspan;
+				while (cur <= end) {
+					if (!_isAnyThroughByColumn(cells, cur)) {
+						cellsInOneColumn = _getCellsByColumnRange(cells, start, cur);
+						column = new BootstrapColumnViewModel();
+						column.left = start;
+						column.right = cur;
+						if (cellsInOneColumn.length == 1) {
+							column.rows.push.apply(column.rows, cellsInOneColumn);
+						} else if (cellsInOneColumn.length > 1) {
+							column.rows.push.apply(column.rows, _splitByRow(cellsInOneColumn));
+						}
+						bootstrapColumns.push(column);
+						start = cur;
+					}
+					cur++;
+				}
+				return bootstrapColumns;
+			}
+			var rows = _splitByRow(this.cells);
+			return '<div class="container-fluid">{0}</div>'.format(this._map(rows, function(r) {
+				return r.toHtml();
+			}).join(''));
 		}
 	};
 	$.extend(this, _methods);
 });
 GridViewModel.inherit(BaseViewModel);
+

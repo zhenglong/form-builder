@@ -10,6 +10,7 @@ var CellViewModel = _class(function () {
 		x: 0,
 		y: 0
 	};
+	this.children = [];
 	var _defaults = {
 		backgroundColor:'#ccc',
 		activeClass: 'active'
@@ -109,6 +110,13 @@ var CellViewModel = _class(function () {
 				this.elem.addClass(this.makeCls(this.pos.y, this.pos.x, this.size.colspan, this.size.rowspan));
 			}
 			this.upper().render.apply(this, arguments);
+		},
+		toHtml: function() {
+			var result = [];
+			this._each(this.children, function(i, child) {
+				result.push(child.toHtml());
+			});
+			return result.join('');
 		}
 	};
 	$.extend(this, _methods);

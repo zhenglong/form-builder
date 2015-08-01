@@ -3,7 +3,8 @@
 var ToolBarViewModel = _class(function () {
 	this.upper().constructor.apply(this, arguments);
 	this.elem = $('<ul class="tool-bar"></ul>');
-	var btnTemplate = '<li class="tool-item {2}"><button id="{0}">{1}</button></li>';
+	this.modal = new HtmlPreviewModal();
+	var btnTemplate = '<li class="tool-item {2}"><button id="{0}" class="btn btn-default">{1}</button></li>';
 	var self = this;
 	var buttons = [{
 		id: 'insert-after',
@@ -154,6 +155,15 @@ var ToolBarViewModel = _class(function () {
 				bottom = Math.max(bottom, c.pos.y + c.size.rowspan);
 			});
 			self.grid.merge(left, right, top, bottom);
+		}
+	}, {
+		id: 'preview',
+		text: '预览',
+		classes: '', // always show
+		click: function() {
+			self.modal.init();
+			self.modal.setOutput(self.grid.toHtml());
+			self.modal.show();
 		}
 	}];
 	

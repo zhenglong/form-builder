@@ -5,7 +5,7 @@ if (!String.prototype.format) {
 		var fmt = this;
 		var params = Array.prototype.slice.call(arguments);
 		return fmt.replace(/(\{(\d+)\})/g, function(match, firstCap, index) {
-			return params[index] || match;
+			return ((params[index] === undefined) ? match : params[index]);
 		});
 	};
 }
