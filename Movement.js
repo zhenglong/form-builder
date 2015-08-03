@@ -1,9 +1,9 @@
 /*
  *
  * data's strcture
- * for move: {from:null, to:null}
- * for insert: {parent:null, after:null}
- *
+ * move: {from:pos, to:pos}
+ * insert: {parent:GridViewModel, after:CellViewModel}
+ * addField: {field:FieldMeta}
  */
 function FrameDataViewModel(cell, type, data) {
 	this.cell = cell;
@@ -13,7 +13,10 @@ function FrameDataViewModel(cell, type, data) {
 var RenderType = {
 	insert: 1,
 	delete: 10,
-	move: 20 
+	move: 20,
+	addField: 30,
+	removeField: 31,
+	updateField: 32
 };
 
 (function() {
@@ -76,6 +79,10 @@ var Movement = _class(function () {
 							break;
 						case RenderType.delete:
 							frame.cell.elem.remove();
+							break;
+						case RenderType.addField:
+							frame.data.field.elem.appendTo(frame.cell.elem);
+							break;
 					}
 				}
 				if (!this._hasAny()) {

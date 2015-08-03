@@ -5,15 +5,10 @@ var FieldType = {
 	string: 102,
 	email: 103,
 	password: 104,
-	prependedText: 105,
-	appendedText: 106,
 	textArea: 107,
 	select: 200,
-	multiSelect: 201,
 	radioButton: 202,
-	radioButtonList: 203,
 	checkBox: 204,
-	checkBoxList: 205
 };
 
 var TableMeta = _class(function () {
@@ -43,60 +38,64 @@ TableMeta.inherit(BaseViewModel);
 
 var FieldMeta = _class(function() {
 	this.upper().constructor.apply(this, arguments);
+	// TODO: name should be only set once in init.
 	this.name = '';
 	this.displayText = '';
 	this.dataSource = null;
 	this.placeholder = '';
+	this.isMultipleValue = false;
 	var _type = FieldType.none;
+	// use getVisualElement() when its value is wanted.
+	var _visualElement = null;
+	var _tpl = '<div class="field-block"><span>{0}</span><i class="close field-remove">&times;</i></div>';
+	var _parent = null;
 
 	var _methods = {
 		init: function(type, name) {
 			this.name = name;
-			this.type = type;
+			_type = type;
+			_visualElement = DataVisualElement.createFromType(_type, this.isMultipleValue);
+		},
+		/*
+		 *
+		 * @param target {CellViewModel}
+		 */
+		dropIn: function(target) {
+			// TODO: need refactor
+			if (_parent) throw 'field could be dropped in only one cell';
+			if (!this.elem) {
+				this.elem = $(_tpl.format(this.name));
+				this.elem.data('__fbld_vm__', this);
+				_parent = target;
+			}
+			target.container.movement.push(new FrameDataViewModel(target, RenderType.addField, {
+				field: this
+			}));
+		},
+		dismiss: function() {
+			target.container.movement.push(new FrameDataViewModel(_parent, RenderType.removeField, {
+				field: this
+			}));
 		},
 		getType: function() {
 			return _type;
 		},
+		getVisualElement; function() {
+			_visualElement.elementId = this.name;
+			_visualElement.elementName = this.name;
+			_visualElement.label = this.displayText;
+			_visualElement.placeholder = this.placeholder;
+		
+			// TODO: need refactor here
+			_visualElement.dataSource = this.dataSource;
+			return result;
+		},
 		toHtml: function() {
-			switch(_type) {
-				case FieldType.email:
-				case FieldType.integer:
-				case FieldType.number:
-				case FieldType.password:
-				case FieldType.prependedText:
-				case FieldType.appendedText:
-				case FieldType.string:
-				case FieldType.textArea:
-					return this.renderTextInput(_type);
-				case FieldType.checkBox:
-					return this.renderCheckbox();
-				case FieldType.checkBoxList:
-					return this.renderCheckboxList();
-				case FieldType.radioButton:
-					return this.renderRadio();
-				case FieldType.radioButtonList:
-					return this.renderRadioList();
-				case FieldType.select:
-					return this.renderSelect();
-				case FieldType.multiSelect:
-					return this.renderMultiSelect();
-			}
+			return this.getVisualElement().toHtml();
 		},
-		renderRadio: function() {
-			return '<input type="radio" ';
-		},
-		renderRadioList: function() {
-		},
-		renderCheckbox: function() {
-		},
-		renderCheckboxList: function() {
-		},
-		renderTextInput: function() {
-		},
-		renderSelect: function() {
-		},
-		renderMultiSelect: function() {
-		},
+		render: function() {
+			// nothing to do
+		}
 	};
 	$.extend(this, _methods);
 });
