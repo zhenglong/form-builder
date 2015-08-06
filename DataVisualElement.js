@@ -60,10 +60,10 @@ var DataVisualElement = _class(function() {
 	};
 	$.extend(this, _methods);
 });
-DataVisualElement.createFromType = (fieldType, isMultiple) {
+DataVisualElement.createFromType = function(fieldType, isMultiple) {
 	var result = null;
 	isMultiple = !!isMultiple;
-	switch(type) {
+	switch(fieldType) {
 		case FieldType.checkBox:
 			result = new CheckboxVisualElement();
 			result.init(isMultiple);
@@ -105,9 +105,9 @@ var TextInputVisualElement = _class(function() {
 		_renderControl: function() {
 			if (this.appendedAddon || this.prependedAddon) {
 				return '<div class="form-group">{0}{1}{2}</div>'.format(
-					this.prependedAddon ? '<div class="input-group-addon">{0}</div>'.format(this.prependedAddon : ''), 
+					this.prependedAddon ? '<div class="input-group-addon">{0}</div>'.format(this.prependedAddon) : '', 
 					this._renderInput(),
-					this.appendedAddon ? '<div class="input-group-addon">{0}</div>'.format(this.appendedAddon : ''));
+					this.appendedAddon ? '<div class="input-group-addon">{0}</div>'.format(this.appendedAddon) : '');
 			} else {
 				return this._renderInput();
 			}
@@ -116,14 +116,14 @@ var TextInputVisualElement = _class(function() {
 			if (this.type in _type) {
 				return '<input type="{0}" placeholder="{3}" {1} {2}  class="{4}" />'.format(
 					_type[this.type], this.elementId ? 'id="{0}"'.format(this.elementId) : '', 
-					this.elementName ? 'name="{0}"'.format(this.elementName), 
+					this.elementName ? 'name="{0}"'.format(this.elementName) : '', 
 					this.placeholder, this.cssClasses.join(' '));
 			} else {
 				switch(this.type) {
 					case FieldType.textArea:
 						return '<textarea placeholder="{2}" {0} {1} class="{3}"></textarea>'.format(
 							this.elementId ? 'id="{0}"'.format(this.elementId) : '', 
-							this.elementName ? 'name="{0}"'.format(this.elementName), 
+							this.elementName ? 'name="{0}"'.format(this.elementName) : '', 
 							this.placeholder, this.cssClasses.join(' '));
 				}
 			}
@@ -153,7 +153,7 @@ var CheckboxVisualElement = _class(function() {
 	var _isMultiple = false;
 	this.dataSource = null;
 	var _methods = {
-		init: function(fieldType) {
+		init: function(isMultiple) {
 			this.upper().init(FieldType.radioButton);
 			_isMultiple = isMultiple;
 		},
@@ -168,7 +168,7 @@ var SelectVisualElement = _class(function() {
 	var _isMultiple = false;
 	this.dataSource = null;
 	var _methods = {
-		init: function(fieldType) {
+		init: function(isMultiple) {
 			this.upper().init(FieldType.select);
 			_isMultiple = isMultiple;
 		},

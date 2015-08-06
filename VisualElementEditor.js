@@ -8,7 +8,7 @@ var VisualElementEditor = _class(function() {
 		init: function(visualElement) {
 			var title, content;
 			var this_ = this;
-			if (!visualElement) {
+			if (visualElement) {
 				_visualElement = visualElement;
 				content = this._map(visualElement.meta, function(m) {
 					return m.toHtml();

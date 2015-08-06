@@ -39,8 +39,11 @@ var CellViewModel = _class(function () {
 			return result;
 		},
 		_registerEvents: function() {
-			this.elem.on('drop', function(e) {
-				console.log('drop on me');
+			this.elem.on('dragover', function(e) {
+				e.preventDefault();
+			}).on('dragenter', function(e) {
+				console.log('drag enter me:' + self._id);
+				e.preventDefault();
 			}).on('click', function(e) {
 				$(this).toggleClass('active');
 				self.container.onCellActiveChange({cell:self, isActive:self.isActive()});

@@ -17,8 +17,9 @@ var TableMeta = _class(function () {
 	this.fields = [];
 
 	var _methods = {
-		init: function(name) {
+		init: function(name, fields) {
 			this.name = name;
+			fields && (this.fields = fields);
 		},
 		addFields: function(fields) {
 			if (!fields) return;
@@ -80,7 +81,7 @@ var FieldMeta = _class(function() {
 		getType: function() {
 			return _type;
 		},
-		getVisualElement; function() {
+		getVisualElement: function() {
 			_visualElement.elementId = this.name;
 			_visualElement.elementName = this.name;
 			_visualElement.label = this.displayText;
@@ -99,4 +100,4 @@ var FieldMeta = _class(function() {
 	};
 	$.extend(this, _methods);
 });
-
+FieldMeta.inherit(BaseViewModel);

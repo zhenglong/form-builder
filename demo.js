@@ -5,8 +5,24 @@ function _main() {
 	grid.init(3, 4);
 	var toolbar = new ToolBarViewModel();
 	toolbar.init($(document.body), grid);
-	var fieldToolbar = new fieldToolbar();
+	var fieldToolbar = new FieldToolbar();
 	var tables = [];
+	var t = new TableMeta();
+	var field;
+	t.init('User');
+	field = new FieldMeta();
+	field.init(FieldType.string, 'name');
+	t.addFields(field);
+
+	field = new FieldMeta();
+	field.init(FieldType.string, 'age');
+	t.addFields(field);
+
+	field = new FieldMeta();
+	field.init(FieldType.string, 'address');
+	t.addFields(field);
+	tables.push(t);
+
 	fieldToolbar.init(tables);
 
 	var fieldEditor = new VisualElementEditor();

@@ -49,3 +49,49 @@
 .hide {
 	display:none;
 }
+
+.field-toolbar {
+	position:absolute;
+	left:0em;
+	top:0em;
+	list-style:none;
+	z-index:999;
+	margin-bottom:0em;
+	padding-left:0em;
+	.table-block {
+		text-align:center;
+		.table-header {
+			background-color:#b3b3b3;
+			font-weight:bold;
+			padding:0em 0.3em;
+			font-size:1.2em;
+		}
+
+		.table-fields {
+			list-style:none;
+			margin:0em;
+			padding:0em 0.3em;
+			background-color:#fff;
+		}
+		.table-fields > li {
+			cursor:pointer;
+			padding-top:0.5em;
+		}
+	}
+}
+
+.field-block {
+	position:relative;
+	float:left;
+	.close {
+	}
+}
+
+.visual-element-editor {
+	right:0em;
+	top:5em;
+	left:initial;
+}
+.popover.in {
+	display:block;
+}
