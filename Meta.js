@@ -66,17 +66,21 @@ var FieldMeta = _class(function() {
 			if (_parent) throw 'field could be dropped in only one cell';
 			if (!this.elem) {
 				this.elem = $(_tpl.format(this.name));
-				this.elem.data('__fbld_vm__', this);
-				_parent = target;
 			}
+			
+			if (!this.elem.data('__fbld_vm__')) this.elem.data('__fbld_vm__', this);
+			_parent = target;
+			target.children.push(this);
 			target.container.movement.push(new FrameDataViewModel(target, RenderType.addField, {
 				field: this
 			}));
 		},
 		dismiss: function() {
-			target.container.movement.push(new FrameDataViewModel(_parent, RenderType.removeField, {
+			_parent.container.movement.push(new FrameDataViewModel(_parent, RenderType.removeField, {
 				field: this
 			}));
+			_parent.children.splice(_parent.children.indexOf(this), 1);
+			_parent = null;
 		},
 		getType: function() {
 			return _type;
@@ -89,7 +93,7 @@ var FieldMeta = _class(function() {
 		
 			// TODO: need refactor here
 			_visualElement.dataSource = this.dataSource;
-			return result;
+			return _visualElement;
 		},
 		toHtml: function() {
 			return this.getVisualElement().toHtml();

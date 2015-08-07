@@ -74,7 +74,7 @@
 			background-color:#fff;
 		}
 		.table-fields > li {
-			cursor:pointer;
+			cursor:move;
 			padding-top:0.5em;
 		}
 	}
@@ -83,7 +83,13 @@
 .field-block {
 	position:relative;
 	float:left;
+	padding: 0.25em;
+    border: 1px solid #ddd;
+    margin: 0.15em;
+    @include box-shadow(0px, 0px, 10px, #eee);
+    background-color: #bebebe;
 	.close {
+		margin-left:0.25em;
 	}
 }
 

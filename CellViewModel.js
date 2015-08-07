@@ -20,6 +20,7 @@ var CellViewModel = _class(function () {
 		init: function(container) {
 			this.container = container;
 			this._registerEvents();
+			this.elem.data('__fbld_vm__', this);
 		},
 		clone: function() {
 			var copiedProperties = {
@@ -39,12 +40,8 @@ var CellViewModel = _class(function () {
 			return result;
 		},
 		_registerEvents: function() {
-			this.elem.on('dragover', function(e) {
-				e.preventDefault();
-			}).on('dragenter', function(e) {
-				console.log('drag enter me:' + self._id);
-				e.preventDefault();
-			}).on('click', function(e) {
+			this.elem.on('click', function(e) {
+				if ($(e.target).hasClass('field-remove')) return;
 				$(this).toggleClass('active');
 				self.container.onCellActiveChange({cell:self, isActive:self.isActive()});
 			});

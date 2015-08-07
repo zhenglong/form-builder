@@ -83,6 +83,8 @@ var Movement = _class(function () {
 						case RenderType.addField:
 							frame.data.field.elem.appendTo(frame.cell.elem);
 							break;
+						case RenderType.removeField:
+							frame.data.field.elem.remove();
 					}
 				}
 				if (!this._hasAny()) {

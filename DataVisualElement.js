@@ -67,9 +67,11 @@ DataVisualElement.createFromType = function(fieldType, isMultiple) {
 		case FieldType.checkBox:
 			result = new CheckboxVisualElement();
 			result.init(isMultiple);
+			break;
 		case FieldType.radioButton:
 			result = new RadioVisualElement();
 			result.init(isMultiple);
+			break;
 		case FieldType.email:
 		case FieldType.integer:
 		case FieldType.number:
@@ -78,9 +80,11 @@ DataVisualElement.createFromType = function(fieldType, isMultiple) {
 		case FieldType.textArea:
 			result = new TextInputVisualElement();
 			result.init(fieldType);
+			break;
 		case FieldType.select:
 			result = new SelectVisualElement();
 			result.init(isMultiple);
+			break;
 	}
 
 	return result;

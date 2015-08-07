@@ -28,11 +28,31 @@ function _main() {
 	var fieldEditor = new VisualElementEditor();
 	fieldEditor.init();
 
+	var currentDropTarget;
+	grid.elem.on('dragover', '.builder-block', function(e) {
+			e.preventDefault();
+		}).on('dragenter', '.builder-block', function(e) {
+			currentDropTarget = $(this).data('__fbld_vm__');
+			e.preventDefault();
+		});
+
+
+	fieldToolbar.elem.on('dragend', '[draggable="true"]', function(e) {
+		var $this = $(this), tableId = $this.data('table-id'), fieldId = $this.data('field-id');
+		var dummy = new BaseViewModel();
+		var field = dummy._grep(dummy._grep(fieldToolbar.tables, function(t) {
+			return t._id == tableId;
+		})[0].fields, function(f) {
+			return f._id == fieldId;
+		})[0];
+		field.dropIn(currentDropTarget);
+	});
 	grid.elem.on('click', '.field-block', function(e) {
-		fieldEditor.init($(e.srcElement).data('__fbld_vm__').getVisualElement());
+		fieldEditor.init($(e.target).data('__fbld_vm__').getVisualElement());
 		fieldEditor.show();
-	}).on('click', '.field-remove', function() {
-		$(e.srcElement).data('__fbld_vm__').dismiss();
+	}).on('click', '.field-remove', function(e) {
+		$(e.target).closest('.field-block').data('__fbld_vm__').dismiss();
+		e.stopPropagation();
 	});
 }
 $(function() {
