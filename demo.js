@@ -29,6 +29,8 @@ function _main() {
 	fieldEditor.init();
 
 	var currentDropTarget;
+	var currentFieldEditor;
+	var currentFieldEditorTriger;
 	grid.elem.on('dragover', '.builder-block', function(e) {
 			e.preventDefault();
 		}).on('dragenter', '.builder-block', function(e) {
@@ -48,11 +50,30 @@ function _main() {
 		field.dropIn(currentDropTarget);
 	});
 	grid.elem.on('click', '.field-block', function(e) {
-		fieldEditor.init($(e.target).data('__fbld_vm__').getVisualElement());
+		fieldEditor.init($(this).data('__fbld_vm__').getVisualElement());
+		fieldEditor.load();
 		fieldEditor.show();
+		currentFieldEditor = fieldEditor;
+		currentFieldEditorTriger = e.target;
 	}).on('click', '.field-remove', function(e) {
 		$(e.target).closest('.field-block').data('__fbld_vm__').dismiss();
+
+		if (currentFieldEditor) {
+			currentFieldEditor.hide();
+			currentFieldEditor = null;
+			currentFieldEditorTriger = null;
+		}
 		e.stopPropagation();
+	});
+	fieldEditor.elem.on('click', function(e) {
+		currentFieldEditorTriger = e.target;
+	});
+	$(document).on('click', function(e) {
+		if (e.target != currentFieldEditorTriger && currentFieldEditor) {
+			currentFieldEditor.hide();
+			currentFieldEditor = null;
+			currentFieldEditorTriger = null;
+		}
 	});
 }
 $(function() {

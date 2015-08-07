@@ -41,7 +41,7 @@ var CellViewModel = _class(function () {
 		},
 		_registerEvents: function() {
 			this.elem.on('click', function(e) {
-				if ($(e.target).hasClass('field-remove')) return;
+				if ($(e.target).data('__fbld_vm__') != self) return;
 				$(this).toggleClass('active');
 				self.container.onCellActiveChange({cell:self, isActive:self.isActive()});
 			});

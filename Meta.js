@@ -48,12 +48,14 @@ var FieldMeta = _class(function() {
 	var _type = FieldType.none;
 	// use getVisualElement() when its value is wanted.
 	var _visualElement = null;
+	var _isVisualElementInit = false;
 	var _tpl = '<div class="field-block"><span>{0}</span><i class="close field-remove">&times;</i></div>';
 	var _parent = null;
 
 	var _methods = {
 		init: function(type, name) {
 			this.name = name;
+			this.displayText = name;
 			_type = type;
 			_visualElement = DataVisualElement.createFromType(_type, this.isMultipleValue);
 		},
@@ -86,6 +88,13 @@ var FieldMeta = _class(function() {
 			return _type;
 		},
 		getVisualElement: function() {
+			if (!_isVisualElementInit) {
+				this.initVisualElement();
+				_isVisualElementInit = true;
+			}
+			return _visualElement;
+		},
+		initVisualElement: function() {
 			_visualElement.elementId = this.name;
 			_visualElement.elementName = this.name;
 			_visualElement.label = this.displayText;
@@ -93,7 +102,6 @@ var FieldMeta = _class(function() {
 		
 			// TODO: need refactor here
 			_visualElement.dataSource = this.dataSource;
-			return _visualElement;
 		},
 		toHtml: function() {
 			return this.getVisualElement().toHtml();

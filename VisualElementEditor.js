@@ -1,7 +1,7 @@
 
 var VisualElementEditor = _class(function() {
 	var _titleFormat = '编辑字段{0}';
-	var _tpl = '<div class="visual-element-editor popover fade right" role="tooltip"><div class="arrow"></div><h3 class="popover-title">{0}</h3><div class="popover-content">{1}<button type="button" class="btn btn-primary save-element-properties">保存</button></div></div>';
+	var _tpl = '<div class="visual-element-editor popover fade right" role="tooltip"><div class="arrow"></div><h3 class="popover-title">{0}</h3><div class="popover-content"><form>{1}</form><button type="button" class="btn btn-primary save-element-properties">保存</button></div></div>';
 	var _visualElement;
 
 	var _methods = {
@@ -10,7 +10,7 @@ var VisualElementEditor = _class(function() {
 			var this_ = this;
 			if (visualElement) {
 				_visualElement = visualElement;
-				content = this._map(visualElement.meta, function(m) {
+				content = this._map(visualElement.getMeta(), function(m) {
 					return m.toHtml();
 				}).join('');
 				title = visualElement.label;
@@ -25,7 +25,7 @@ var VisualElementEditor = _class(function() {
 				});
 			} else {
 				$('.popover-title', this.elem).text(_titleFormat.format(title || ''));
-				$('.popover-content', this.elem).html(content || '');
+				$('form', this.elem).html(content || '');
 			}
 		},
 		show: function() {
@@ -44,7 +44,7 @@ var VisualElementEditor = _class(function() {
 		load: function() {
 			var values = _visualElement.getValueForEditor();
 			this._each(_visualElement.meta, function(i, m) {
-				$('#' + id).val(values[id]);
+				$('#' + m.name).val(values[m.name]);
 			});
 		}
 	};

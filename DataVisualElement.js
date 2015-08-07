@@ -11,6 +11,10 @@ var DataVisualElement = _class(function() {
 		init: function(fieldType) {
 			this.type = fieldType;
 		},
+		getMeta: function()	 {
+			if (!this.meta.length) this._initMeta();
+			return this.meta;
+		},
 		toHtml: function() {
 			return '<div class="form-group"><label {1}>{0}</label>{2}</div>'.format(
 				this.label, this.elementId ? 'for="{0}"'.format(this.elementId) : '',
@@ -33,23 +37,28 @@ var DataVisualElement = _class(function() {
 			this.cssClasses = data['element-in-editor-style'].split(' ');
 		},
 		_initMeta: function() {
-			var field = new FieldMeta(FieldType.string, 'element-in-editor-id');
+			var field = new FieldMeta();
+			field.init(FieldType.string, 'element-in-editor-id');
 			field.displayText = 'Id';
 			field.placeholder = '输入Id';
 			this.meta.push(field);
-			field = new FieldMeta(FieldType.string, 'element-in-editor-name');
+			field = new FieldMeta();
+			field.init(FieldType.string, 'element-in-editor-name');
 			field.displayText = 'Name';
 			field.placeholder = '输入Name';
 			this.meta.push(field);
-			field = new FieldMeta(FieldType.string, 'element-in-editor-label');
+			field = new FieldMeta();
+			field.init(FieldType.string, 'element-in-editor-label');
 			field.displayText = 'Label';
 			field.placeholder = '输入Label';
 			this.meta.push(field);
-			field = new FieldMeta(FieldType.string, 'element-in-editor-placeholder');
+			field = new FieldMeta();
+			field.init(FieldType.string, 'element-in-editor-placeholder');
 			field.displayText = 'Placeholder';
 			field.placeholder = '输入Placeholder';
 			this.meta.push(field);
-			field = new FieldMeta(FieldType.string, 'element-in-editor-style');
+			field = new FieldMeta();
+			field.init(FieldType.string, 'element-in-editor-style');
 			field.displayText = 'Style';
 			field.placeholder = '输入Style';
 			this.meta.push(field);
