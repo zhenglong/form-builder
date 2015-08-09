@@ -113,7 +113,7 @@ var TextInputVisualElement = _class(function() {
 
 	var _methods = {
 		init: function(fieldType) {
-			this.upper().init(fieldType);
+			this.upper().init.call(this, fieldType);
 		},
 		_renderControl: function() {
 			if (this.appendedAddon || this.prependedAddon) {
@@ -149,13 +149,15 @@ TextInputVisualElement.inherit(DataVisualElement);
 var RadioVisualElement = _class(function() {
 	var _isMultiple = false;
 	this.dataSource = null;
+	var _tpl = '<div class="radio"><label><input type="radio" />{0}</label></div>';
 
 	var _methods = {
 		init: function(isMultiple) {
-			this.upper().init(FieldType.radioButton);
+			this.upper().init.call(this, FieldType.radioButton);
 			_isMultiple = isMultiple;
 		},
 		toHtml: function() {
+			return _tpl.format(this.label);
 		}
 	};
 	$.extend(this, _methods);
@@ -165,12 +167,14 @@ RadioVisualElement.inherit(DataVisualElement);
 var CheckboxVisualElement = _class(function() {
 	var _isMultiple = false;
 	this.dataSource = null;
+	var _tpl = '<div class="checkbox"><label><input type="checkbox" />{0}</label></div>';
 	var _methods = {
 		init: function(isMultiple) {
-			this.upper().init(FieldType.radioButton);
+			this.upper().init.call(this, FieldType.checkBox);
 			_isMultiple = isMultiple;
 		},
 		toHtml: function() {
+			return _tpl.format(this.label);
 		}
 	};
 	$.extend(this, _methods);
@@ -180,12 +184,14 @@ CheckboxVisualElement.inherit(DataVisualElement);
 var SelectVisualElement = _class(function() {
 	var _isMultiple = false;
 	this.dataSource = null;
+	var _tpl = '<select class="{0}"></select>';
 	var _methods = {
 		init: function(isMultiple) {
-			this.upper().init(FieldType.select);
+			this.upper().init.call(this, FieldType.select);
 			_isMultiple = isMultiple;
 		},
 		_renderControl: function() {
+			return _tpl.format(this.cssClasses.join(' '));
 		}
 	};
 	$.extend(this, _methods);

@@ -9,20 +9,35 @@ function _main() {
 	var tables = [];
 	var t = new TableMeta();
 	var field;
-	t.init('User');
+	t.init('widgets');
 	field = new FieldMeta();
-	field.init(FieldType.string, 'name');
+	field.init(FieldType.string, 'string');
 	t.addFields(field);
 
 	field = new FieldMeta();
-	field.init(FieldType.string, 'age');
+	field.init(FieldType.password, 'password');
 	t.addFields(field);
 
 	field = new FieldMeta();
-	field.init(FieldType.string, 'address');
+	field.init(FieldType.textArea, 'textArea');
 	t.addFields(field);
+
+	field = new FieldMeta();
+	field.init(FieldType.select, 'select');
+	t.addFields(field);
+
+	field = new FieldMeta();
+	field.init(FieldType.radioButton, 'radioButton');
+	t.addFields(field);
+
+	field = new FieldMeta();
+	field.init(FieldType.checkBox, 'checkBox');
+	t.addFields(field);
+
+	//field = new FieldMeta();
+	//field.init(FieldType.select, 'select');
+	//t.addFields(field);
 	tables.push(t);
-
 	fieldToolbar.init(tables);
 
 	var fieldEditor = new VisualElementEditor();

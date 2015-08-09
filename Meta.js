@@ -50,6 +50,7 @@ var FieldMeta = _class(function() {
 	var _visualElement = null;
 	var _isVisualElementInit = false;
 	var _tpl = '<div class="field-block"><span>{0}</span><i class="close field-remove">&times;</i></div>';
+	// parent cell dropped in
 	var _parent = null;
 
 	var _methods = {
@@ -59,12 +60,16 @@ var FieldMeta = _class(function() {
 			_type = type;
 			_visualElement = DataVisualElement.createFromType(_type, this.isMultipleValue);
 		},
+		dropIn: function(target) {
+			var inst = new FieldMeta();
+			inst.init(_type, this.name);
+			inst._dropIn(target);
+		},
 		/*
 		 *
 		 * @param target {CellViewModel}
 		 */
-		dropIn: function(target) {
-			// TODO: need refactor
+		_dropIn: function(target) {
 			if (_parent) throw 'field could be dropped in only one cell';
 			if (!this.elem) {
 				this.elem = $(_tpl.format(this.name));
